@@ -164,7 +164,7 @@ namespace Battleships
                 for (var j = 0; j < 10; j++)
                 {
                     var n = WaysShipCanUseCell(shipType, i, j);
-                    probabilityMap[i, j] += n;
+                    probabilityMap[i, j] += n * shipsToSink[shipType];
                 }
             }
         }
@@ -189,7 +189,7 @@ namespace Battleships
                 return false;
             if (isHorizontal)
             {
-                for (var x = x_start; x < x_start + shipSize; x++)
+                for (var x = x_start; x <= x_start + shipSize; x++)
                 {
                     if (x < 0 || x >= 10)
                         return false;
@@ -202,7 +202,7 @@ namespace Battleships
             }
             else
             {
-                for (var y = y_start; y < y_start + shipSize; y++)
+                for (var y = y_start; y <= y_start + shipSize; y++)
                 {
                     if (y < 0 || y >= 10)
                         return false;
