@@ -14,11 +14,12 @@ namespace Battleships
             try
             {
                 var gameApi = new RestApi();
-                for (var i = 0; i < 10; ++i)
+                var i = 0;
+                while (true)
                 {
                     Console.WriteLine("Game {0}:", i + 1);
                     PlayGame(gameApi);
-                    //return;
+                    ++i;
                 }
                 Console.WriteLine("current score: " + gameApi.GetCurrentScore());
             }
@@ -53,7 +54,6 @@ namespace Battleships
             {
                 shoots++;
                 var coords = d.CellToAttack();
-                //return;
                 state = gameApi.Shoot(gameId, coords.Item1, coords.Item2);
                 d.UpdateWithFeedback(coords.Item1, coords.Item2, state.LastShot);
             } while (!state.IsFinished);
