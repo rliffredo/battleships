@@ -16,7 +16,7 @@ namespace Battleships
             CalculateProbabilityMap();
             ChaseHits();
             RemoveKnownCells();
-            PrintProbabilityMap();
+            //PrintProbabilityMap();
             return PickBestCell();
         }
 
@@ -26,7 +26,7 @@ namespace Battleships
             {
                 for (var j = 0; j < 10; j++)
                 {
-                    Console.Write(probabilityMap[i,j] + "\t");
+                    Console.Write(probabilityMap[j,i] + "\t");
                 }
                 Console.Write("\n");
             }
@@ -172,11 +172,11 @@ namespace Battleships
         private int WaysShipCanUseCell(int shipSize, int x, int y)
         {
             int n = 0;
-            for (int c = x - shipSize; c <= x; c++)
-                if (CanShipFit(shipSize, c, y, true))
+            for (int pos_x = x - shipSize; pos_x <= x; pos_x++)
+                if (CanShipFit(shipSize, pos_x, y, true))
                     n++;
-            for (int c = y - shipSize; c <= y; c++)
-                if (CanShipFit(shipSize, x, c, false))
+            for (int pos_y = y - shipSize; pos_y <= y; pos_y++)
+                if (CanShipFit(shipSize, x, pos_y, false))
                     n++;
             return n;
         }
@@ -189,7 +189,7 @@ namespace Battleships
                 return false;
             if (isHorizontal)
             {
-                for (var x = x_start; x < shipSize; x++)
+                for (var x = x_start; x < x_start + shipSize; x++)
                 {
                     if (x < 0 || x >= 10)
                         return false;
@@ -202,7 +202,7 @@ namespace Battleships
             }
             else
             {
-                for (var y = y_start; y < shipSize; y++)
+                for (var y = y_start; y < y_start + shipSize; y++)
                 {
                     if (y < 0 || y >= 10)
                         return false;
@@ -222,10 +222,10 @@ namespace Battleships
                 {
                     if (i < 0 || i >= 10 || j < 0 || j >= 10)
                         continue;
-                    if (IsCellOccupied(i, j))
-                        return false;
+                    if (i!=x && j!=y && IsCellOccupied(i, j))
+                        return true;
                 }
-            return true;
+            return false;
         }
 
         private bool IsCellOccupied(int i, int j)
