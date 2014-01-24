@@ -62,7 +62,7 @@ namespace Battleships
             {
                 for (var j = 0; j < 10; j++)
                 {
-                    if (!IsCellCandidate(i, j))
+                    if (!IsCellKnown(i, j))
                         probabilityMap[i, j] = -1;
                 }
             }
@@ -177,7 +177,7 @@ namespace Battleships
                 for (var j = 0; j < 10; j++)
                 {
                     var n = WaysShipCanUseCell(shipType, i, j);
-                    probabilityMap[i, j] += n;
+                    probabilityMap[i, j] += n * shipsToSink[shipType];
                 }
             }
         }
@@ -248,7 +248,12 @@ namespace Battleships
 
         private bool IsCellCandidate(int i, int j)
         {
-            return boardState[i, j] == CellStates.Unknown;
+            return boardState[i, j] == CellStates.Unknown || boardState[i, j] == CellStates.Hit;
+        }
+
+        private bool IsCellKnown(int i, int j)
+        {
+            return boardState[i, j] != CellStates.Unknown;
         }
 
         private int[] shipsToSink = new int[] {4, 3, 2, 1};
