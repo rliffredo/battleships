@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -13,18 +14,126 @@ namespace Battleships
         {
             ResetProbabilityMap();
             CalculateProbabilityMap();
+            ChaseHits();
+            RemoveKnownCells();
+            PrintProbabilityMap();
             return PickBestCell();
+        }
+
+        private void PrintProbabilityMap()
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                for (var j = 0; j < 10; j++)
+                {
+                    Console.Write(probabilityMap[i,j] + "\t");
+                }
+                Console.Write("\n");
+            }
+            Console.ReadKey();
+        }
+
+        private void ChaseHits()
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                for (var j = 0; j < 10; j++)
+                {
+                    if (boardState[i, j] == CellStates.Hit)
+                    {
+                        IncreaseProbability(i - 1, j);
+                        IncreaseProbability(i + 1, j);
+                        IncreaseProbability(i, j - 1);
+                        IncreaseProbability(i, j + 1);
+                    }
+                }
+            }
+        }
+
+        private void IncreaseProbability(int x, int y)
+        {
+            if (x >= 0 && y >= 0 && x < 10 && y < 10)
+                probabilityMap[x, y] += 10;
+        }
+
+        private void RemoveKnownCells()
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                for (var j = 0; j < 10; j++)
+                {
+                    if (!IsCellCandidate(i, j))
+                        probabilityMap[i, j] = -1;
+                }
+            }
         }
 
         public void UpdateWithFeedback(int x, int y, ShotResult result)
         {
-            if (ShotResult.)
+            if (result == ShotResult.Hit)
+                MarkCurrentShipAsHit(x, y);
+            if (result == ShotResult.HitAndSunk)
+                MarkCurrentShipAsSunk(x, y);
+            if (result == ShotResult.Miss)
+                boardState[x, y] = CellStates.Water;
+        }
+
+        private void MarkCurrentShipAsSunk(int x, int y)
+        {
+            var shipCells = GetSunkenShip(x, y);
+            foreach (var cell in shipCells)
+            {
+                boardState[cell.Item1, cell.Item2] = CellStates.Sunk;
+            }
+            shipsToSink[shipCells.Count-1]--;
+        }
+
+        private IList<Tuple<int, int>> GetSunkenShip(int x, int y)
+        {
+            var ret = new List<Tuple<int, int>>();
+            ret.Add(Tuple.Create(x, y));
+            for (var xpos = x-1; xpos>=0; xpos--)
+                if (boardState[xpos, y] == CellStates.Hit)
+                    ret.Add(Tuple.Create(xpos, y));
+                else
+                    break;
+            for (var xpos = x+1; xpos < 10; xpos++)
+                if (boardState[xpos, y] == CellStates.Hit)
+                    ret.Add(Tuple.Create(xpos, y));
+                else
+                    break;
+
+            for (var ypos = y-1; ypos >= 0; ypos--)
+                if (boardState[x, ypos] == CellStates.Hit)
+                    ret.Add(Tuple.Create(x, ypos));
+                else
+                    break;
+            for (var ypos = y+1; ypos < 10; ypos++)
+                if (boardState[x, ypos] == CellStates.Hit)
+                    ret.Add(Tuple.Create(x, ypos));
+                else
+                    break;
+            return ret;
+        }
+
+        private void MarkCurrentShipAsHit(int x, int y)
+        {
+            boardState[x, y] = CellStates.Hit;
+            lastHit = Tuple.Create(x, y);
         }
 
         private Tuple<int, int> PickBestCell()
         {
-            var r = new Random();
-            return Tuple.Create(r.Next(10), r.Next(10));
+            var ret = Tuple.Create(0, 0);
+            for (var i = 0; i < 10; i++)
+            {
+                for (var j = 0; j < 10; j++)
+                {
+                    if (probabilityMap[i, j] > probabilityMap[ret.Item1, ret.Item2])
+                        ret = Tuple.Create(i, j);
+                }
+            }
+            return ret;
         }
 
         private void CalculateProbabilityMap()
@@ -67,35 +176,39 @@ namespace Battleships
                 if (CanShipFit(shipSize, c, y, true))
                     n++;
             for (int c = y - shipSize; c <= y; c++)
-                if (CanShipFit(shipSize, c, y, false))
+                if (CanShipFit(shipSize, x, c, false))
                     n++;
             return n;
         }
 
-        private bool CanShipFit(int shipSize, int x_start, int y_start, bool isHoriziontal)
+        private bool CanShipFit(int shipSize, int x_start, int y_start, bool isHorizontal)
         {
-            if (isHoriziontal)
+            if (x_start < 0 || x_start >= 10)
+                return false;
+            if (y_start < 0 || y_start >= 10)
+                return false;
+            if (isHorizontal)
             {
-                for (var i = x_start; i < shipSize; i++)
+                for (var x = x_start; x < shipSize; x++)
                 {
-                    if (i < 0 || i >= 10)
+                    if (x < 0 || x >= 10)
                         return false;
-                    if (IsCellOccupied(i, y_start))
+                    if (!IsCellCandidate(x, y_start))
                         return false;
-                    if (HasAdjacents(i, y_start))
+                    if (HasAdjacents(x, y_start))
                         return false;
                 }
                 return true;
             }
             else
             {
-                for (var i = y_start; i < shipSize; i++)
+                for (var y = y_start; y < shipSize; y++)
                 {
-                    if (i < 0 || i >= 10)
+                    if (y < 0 || y >= 10)
                         return false;
-                    if (IsCellOccupied(x_start, i))
+                    if (!IsCellCandidate(x_start, y))
                         return false;
-                    if (HasAdjacents(x_start, i))
+                    if (HasAdjacents(x_start, y))
                         return false;
                 }
                 return true;
@@ -120,9 +233,15 @@ namespace Battleships
             return boardState[i, j] == CellStates.Sunk || boardState[i, j] == CellStates.Hit;
         }
 
+        private bool IsCellCandidate(int i, int j)
+        {
+            return boardState[i, j] == CellStates.Unknown;
+        }
+
         private int[] shipsToSink = new int[] {4, 3, 2, 1};
         private CellStates[,] boardState = new CellStates[10, 10];
         private int[,] probabilityMap = new int[10, 10];
+        private Tuple<int, int> lastHit;
     }
 
     enum CellStates

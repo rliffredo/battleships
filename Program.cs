@@ -11,20 +11,6 @@ namespace Battleships
             ServicePointManager.ServerCertificateValidationCallback =
                 (sender, cert, chain, policy) => true;
 
-
-            //var d = new Decision();
-            //var game = new RestApi();
-            //var gameId = game.CreateNewGame();
-            //GameState state;
-            //var shoots = 0;
-            //do
-            //{
-            //    shoots++;
-            //    var coords = d.CellToAttack();
-            //    state = game.Shoot(gameId, coords.Item1, coords.Item2);
-            //} while (!state.IsFinished);
-            //Console.WriteLine("Total shoots: " + shoots);
-
             try
             {
                 var gameApi = new RestApi();
@@ -58,24 +44,18 @@ namespace Battleships
 
         private static void PlayGame(RestApi gameApi)
         {
+            var d = new Decision();
             var gameId = gameApi.CreateNewGame();
-            var shotCount = 1;
-            for (var row = 0; row < 10; ++row)
+            GameState state;
+            var shoots = 0;
+            do
             {
-                for (var column = 0; column < 10; ++column)
-                {
-                    var result = gameApi.Shoot(gameId, row, column);
-                    Console.Write(GetShotResult(result.LastShot));
-                    if (result.IsFinished)
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine("Done in {0} shots.", shotCount);
-                        return;
-                    }
-                    ++shotCount;
-                }
-                Console.WriteLine();
-            }
+                shoots++;
+                var coords = d.CellToAttack();
+                state = gameApi.Shoot(gameId, coords.Item1, coords.Item2);
+                d.UpdateWithFeedback(coords.Item1, coords.Item2, state.LastShot);
+            } while (!state.IsFinished);
+            Console.WriteLine("Total shoots: " + shoots);
         }
     }
 }
