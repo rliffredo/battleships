@@ -28,13 +28,53 @@ namespace Battleships
             try
             {
                 var gameApi = new RestApi();
-                var gameId = gameApi.CreateNewGame();
-                var result = gameApi.Shoot(gameId, 5, 5);
+                for (var i = 0; i < 10; ++i)
+                {
+                    Console.WriteLine("Game {0}:", i + 1);
+                    PlayGame(gameApi);
+                }
                 Console.WriteLine("current score: " + gameApi.GetCurrentScore());
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+            }
+        }
+
+        static string GetShotResult(ShotResult result)
+        {
+            switch (result)
+            {
+                case ShotResult.Miss:
+                    return ".";
+                case ShotResult.Hit:
+                    return "x";
+                case ShotResult.HitAndSunk:
+                    return "X";
+            }
+
+            return " ";
+        }
+
+        private static void PlayGame(RestApi gameApi)
+        {
+            var gameId = gameApi.CreateNewGame();
+            var shotCount = 1;
+            for (var row = 0; row < 10; ++row)
+            {
+                for (var column = 0; column < 10; ++column)
+                {
+                    var result = gameApi.Shoot(gameId, row, column);
+                    Console.Write(GetShotResult(result.LastShot));
+                    if (result.IsFinished)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("Done in {0} shots.", shotCount);
+                        return;
+                    }
+                    ++shotCount;
+                }
+                Console.WriteLine();
             }
         }
     }
