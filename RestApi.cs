@@ -9,7 +9,10 @@ namespace Battleships
     {
         private const string ServiceAddress = "https://10.12.216.168";
         private const string AuthHeader = "X-Auth-ShipsApiKey";
+        // Roberto
         private const string UserToken = "3907c0dfa1ce4c59be420815085d9c4b";
+        // Stefan
+        //private const string UserToken = "35b2573c0dc74dc49864ce8ba18ed91c";
         private const string ContentTypeHeader = "Content-Type";
         private const string ContentTypeHeaderValue = "application/json; charset=utf-8";
 
