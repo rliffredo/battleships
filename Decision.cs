@@ -9,7 +9,7 @@ namespace Battleships
 {
     class Decision
     {
-        Tuple<int, int> CellToAttack()
+        public Tuple<int, int> CellToAttack()
         {
             var r = new Random();
             return Tuple.Create(r.Next(10), r.Next(10));
