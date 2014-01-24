@@ -44,13 +44,13 @@ namespace Battleships
             return response.Data["Id"];
         }
 
-        private const string RowNames = "ABCDEFGHIJ";
+        private const string ColumnNames = "ABCDEFGHIJ";
 
         private static dynamic CreateShot(int row, int column)
         {
-            var r = RowNames.Substring(row, 1);
-            var c = column + 1;
-            return new { Location = r + c };
+            var c = ColumnNames.Substring(column, 1);
+            var r = row + 1;
+            return new { Location = c + r };
         }
 
         static ShotResult GetShotResult(string resultString)
