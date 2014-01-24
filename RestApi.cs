@@ -12,7 +12,7 @@
             return string.Empty;
         }
 
-        public GameState Shoot(int x, int y)
+        public GameState Shoot(string gameId, int x, int y)
         {
             // TODO:
             // send POST to /Attack/{GameId}
