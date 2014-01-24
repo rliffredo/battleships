@@ -18,6 +18,7 @@ namespace Battleships
                 {
                     Console.WriteLine("Game {0}:", i + 1);
                     PlayGame(gameApi);
+                    //return;
                 }
                 Console.WriteLine("current score: " + gameApi.GetCurrentScore());
             }
@@ -52,6 +53,7 @@ namespace Battleships
             {
                 shoots++;
                 var coords = d.CellToAttack();
+                //return;
                 state = gameApi.Shoot(gameId, coords.Item1, coords.Item2);
                 d.UpdateWithFeedback(coords.Item1, coords.Item2, state.LastShot);
             } while (!state.IsFinished);

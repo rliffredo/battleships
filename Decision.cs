@@ -62,7 +62,7 @@ namespace Battleships
             {
                 for (var j = 0; j < 10; j++)
                 {
-                    if (!IsCellKnown(i, j))
+                    if (IsCellKnown(i, j))
                         probabilityMap[i, j] = -1;
                 }
             }
