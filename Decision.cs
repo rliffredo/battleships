@@ -124,16 +124,29 @@ namespace Battleships
 
         private Tuple<int, int> PickBestCell()
         {
-            var ret = Tuple.Create(0, 0);
+            var bestCandidate = Tuple.Create(0, 0);
             for (var i = 0; i < 10; i++)
             {
                 for (var j = 0; j < 10; j++)
                 {
-                    if (probabilityMap[i, j] > probabilityMap[ret.Item1, ret.Item2])
-                        ret = Tuple.Create(i, j);
+                    if (probabilityMap[i, j] > probabilityMap[bestCandidate.Item1, bestCandidate.Item2])
+                        bestCandidate = Tuple.Create(i, j);
                 }
             }
-            return ret;
+
+            var bestCandidates = new List<Tuple<int, int>>();
+            for (var i = 0; i < 10; i++)
+            {
+                for (var j = 0; j < 10; j++)
+                {
+                    if (probabilityMap[i, j] == probabilityMap[bestCandidate.Item1, bestCandidate.Item2])
+                        bestCandidates.Add(Tuple.Create(i, j));
+                }
+            }
+
+            var r = new Random();
+            var pos = r.Next(bestCandidates.Count);
+            return bestCandidates[pos];
         }
 
         private void CalculateProbabilityMap()
