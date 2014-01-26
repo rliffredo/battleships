@@ -24,13 +24,44 @@ namespace Battleships.Decision
 
         public void UpdateWithFeedback(int x, int y, ShotResult result)
         {
-            // TODO
-            //if (result == ShotResult.Hit)
-            //    MarkCurrentShipAsHit(x, y);
-            //if (result == ShotResult.HitAndSunk)
-            //    MarkCurrentShipAsSunk(x, y);
-            //if (result == ShotResult.Miss)
-            //    boardState[x, y] = CellStates.Water;
+            if (result == ShotResult.Hit)
+                MarkShipAsHit(x, y);
+            if (result == ShotResult.HitAndSunk)
+                MarkShipAsSunk(x, y);
+            if (result == ShotResult.Miss)
+                MarkKnown(x, y);
+        }
+
+        private void MarkKnown(int x, int y)
+        {
+            _knownCells.Add(new CellCoords(x, y));
+        }
+
+        private void MarkShipAsHit(int x, int y)
+        {
+            MarkKnown(x, y);
+
+            var cell = new CellCoords(x, y);
+            _currentShip.Cells.Add(cell);
+
+            throw new NotImplementedException();
+        }
+
+        private void MarkShipAsSunk(int x, int y)
+        {
+            MarkShipAsHit(x, y);
+
+            var ship = _ships.First(s => s.Size == _currentShip.Cells.Count && !s.IsSunken);
+            foreach (var cell in _currentShip.Cells)
+            {
+                ship.Cells.Add(cell);
+                foreach (var adjCell in cell.GetSurroundingCells())
+                {
+                    _knownCells.Add(adjCell);
+                }
+            }
+
+            _currentShip.Cells.Clear();
         }
 
         public Decision()
@@ -47,7 +78,7 @@ namespace Battleships.Decision
 
         private bool IsChasing()
         {
-            return _currentShip != null;
+            return _currentShip.Cells.Count > 0;
         }
 
         private IList<CellCoords> ChaseShip()
@@ -77,9 +108,9 @@ namespace Battleships.Decision
             return map.GetBestCandidates();
         }
 
-        private ShipInfo _currentShip = null;
+        private ShipInfo _currentShip = new ShipInfo(0);
         private IList<ShipInfo> _ships = new List<ShipInfo>();
-        private IList<CellCoords> _knownCells = new List<CellCoords>();
+        private ISet<CellCoords> _knownCells = new HashSet<CellCoords>();
 
     }
 

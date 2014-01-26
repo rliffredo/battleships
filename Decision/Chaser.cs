@@ -8,7 +8,7 @@ namespace Battleships.Decision
 {
     class Chaser
     {
-        public Chaser(IList<CellCoords> cellsToAvoid)
+        public Chaser(IEnumerable<CellCoords> cellsToAvoid)
         {
             _cellsToAvoid = cellsToAvoid;
         }
@@ -21,7 +21,7 @@ namespace Battleships.Decision
                 .ToList();
         }
 
-        private IList<CellCoords> _cellsToAvoid = new List<CellCoords>();
+        private IEnumerable<CellCoords> _cellsToAvoid;
 
     }
 

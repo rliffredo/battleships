@@ -53,17 +53,18 @@ namespace Battleships.Decision
             return (cell.x >= _left && cell.x <= _right) && (cell.y >= _top && cell.y <= _bottom);
         }
 
-        public BoardArea FindLargestWithout(IList<CellCoords> cells)
+        public BoardArea FindLargestWithout(IEnumerable<CellCoords> cells)
         {
-            if (cells.Count == 0)
+            var cellList = cells.ToList();
+            if (cellList.Count == 0)
                 return this;
 
-            var cell = cells.FirstOrDefault(c => this.Contains(c));
+            var cell = cellList.FirstOrDefault(c => this.Contains(c));
             if (cell == null)
                 return this;
 
-            var slices = this.Split(cells[0]);
-            var reducedCells = cells.SkipWhile(c => c == cell).ToList();
+            var slices = this.Split(cellList[0]);
+            var reducedCells = cellList.SkipWhile(c => c == cell).ToList();
             var largestPatches = slices.Select(s => s.FindLargestWithout(reducedCells));
             var maxArea = largestPatches.Max(p => p.Area);
             return largestPatches.First(p => p.Area == maxArea);

@@ -9,10 +9,10 @@ namespace Battleships.Decision
     class ProbabilityMap
     {
         private IDictionary<CellCoords, int> _map = new Dictionary<CellCoords, int>();
-        private IList<ShipInfo> _ships;
-        private IList<CellCoords> _knownCells;
+        private IEnumerable<ShipInfo> _ships;
+        private IEnumerable<CellCoords> _knownCells;
 
-        public ProbabilityMap(IList<ShipInfo> ships, IList<CellCoords> knownCells)
+        public ProbabilityMap(IEnumerable<ShipInfo> ships, IEnumerable<CellCoords> knownCells)
         {
             _ships = ships;
             _knownCells = knownCells;
