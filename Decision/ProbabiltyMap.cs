@@ -32,7 +32,7 @@ namespace Battleships.Decision
             return _map.Where(c => c.Value == maxProb).Select(c => c.Key).ToList();
         }
 
-        void UpdateProbabilityMapForShip(int shipSize) // uses _ships (indirectly)
+        void UpdateProbabilityMapForShip(int shipSize)
         {
             foreach (var cell in _map.Keys)
             {
@@ -40,7 +40,7 @@ namespace Battleships.Decision
             }
         }
 
-        int WaysShipCanFit(CellCoords cell, int shipSize) // uses _ships (indirectly)
+        int WaysShipCanFit(CellCoords cell, int shipSize)
         {
             if (shipSize == 1)
                 return HasAdjacents(cell) ? 0 : 1;
@@ -55,7 +55,7 @@ namespace Battleships.Decision
             return w;
         }
 
-        bool CanFitShip(int shipSize, CellCoords baseCell, Func<CellCoords, int, CellCoords> offsetCell) // uses _ships (indirectly)
+        bool CanFitShip(int shipSize, CellCoords baseCell, Func<CellCoords, int, CellCoords> offsetCell)
         {
             var cell = baseCell;
             for (var i = 0; i < shipSize; ++i)
@@ -74,13 +74,13 @@ namespace Battleships.Decision
             return _knownCells.Contains(cell);
         }
 
-        bool HasAdjacents(CellCoords cell) // uses _ships
+        bool HasAdjacents(CellCoords cell)
         {
-            var cellsToCheck = GetSurroundingCells(cell);
+            var cellsToCheck = cell.GetSurroundingCells();
             return _ships.Any(ship => cellsToCheck.Intersect(ship.Cells).Count() > 0);
         }
 
-        private IEnumerable<int> ShipsToSink // uses _ships
+        private IEnumerable<int> ShipsToSink
         {
             get
             {
@@ -89,16 +89,6 @@ namespace Battleships.Decision
                                 .Select(s => s.Size)
                                 .Distinct();
             }
-        }
-
-        private List<CellCoords> GetSurroundingCells(CellCoords c)
-        {
-            var ret = new List<CellCoords>();
-            for (int i = -1; i <= 1; ++i)
-                for (int j = -1; j <= 1; ++j)
-                    if (i != 0 || j != 0)
-                        ret.Add(new CellCoords(c.x + i, c.y + j));
-            return ret;
         }
     }
 }

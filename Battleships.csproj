@@ -44,8 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoardArea.cs" />
+    <Compile Include="Decision\BoardArea.cs" />
+    <Compile Include="Decision\CellCoords.cs" />
+    <Compile Include="Decision\Chaser.cs" />
     <Compile Include="Decision\Decision.cs" />
+    <Compile Include="Decision\ShipInfo.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="Decision\DecisionOld.cs" />
     <Compile Include="Decision\IDecision.cs" />

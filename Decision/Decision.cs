@@ -6,24 +6,6 @@ using System.Threading.Tasks;
 
 namespace Battleships.Decision
 {
-    class CellCoords
-    {
-        public const int MAX = 9; // 10x10 grid
-
-        public CellCoords(int x, int y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-
-        public readonly int x;
-        public readonly int y;
-
-        public Tuple<int, int> AsTuple()
-        {
-            return Tuple.Create(this.x, this.y);
-        }
-    }
 
     class Decision: IDecision
     {
@@ -42,6 +24,7 @@ namespace Battleships.Decision
 
         public void UpdateWithFeedback(int x, int y, ShotResult result)
         {
+            // TODO
             //if (result == ShotResult.Hit)
             //    MarkCurrentShipAsHit(x, y);
             //if (result == ShotResult.HitAndSunk)
@@ -57,21 +40,20 @@ namespace Battleships.Decision
 
         private void CreateInitialShips()
         {
-            for (int i = 1; i <= 4; ++i)
+            for (int i = 1; i <= ShipInfo.MAX_SIZE; ++i)
                 for (int j = i; j <= 4; ++j)
                     _ships.Add(new ShipInfo(i));
         }
 
         private bool IsChasing()
         {
-            // TODO
-            return false;
+            return _currentShip != null;
         }
 
-        private List<CellCoords> ChaseShip()
+        private IList<CellCoords> ChaseShip()
         {
-            // TODO
-            return new List<CellCoords>();
+            var chaser = new Chaser(_knownCells);
+            return chaser.GetShots(_currentShip);
         }
 
         private CellCoords RandomShot(IList<CellCoords> candidates)
@@ -84,7 +66,7 @@ namespace Battleships.Decision
 
         private List<CellCoords> LargestUnknownPatch()
         {
-            var entireBoard = new BoardArea(new CellCoords(0, 0), new CellCoords(CellCoords.MAX, CellCoords.MAX));
+            var entireBoard = new BoardArea(CellCoords.Min(), CellCoords.Max());
             var res = entireBoard.FindLargestWithout(_knownCells);
             return res.AllCells;
         }
@@ -95,23 +77,10 @@ namespace Battleships.Decision
             return map.GetBestCandidates();
         }
 
+        private ShipInfo _currentShip = null;
         private IList<ShipInfo> _ships = new List<ShipInfo>();
         private IList<CellCoords> _knownCells = new List<CellCoords>();
 
-    }
-    class ShipInfo
-    {
-        public ShipInfo(int size)
-        {
-            _size = size;
-        }
-
-        public bool IsSunken { get { return _cells.Count == _size; } }
-        public IList<CellCoords> Cells { get { return _cells; } }
-        public int Size { get { return _size; } }
-
-        private int _size;
-        private IList<CellCoords> _cells = new List<CellCoords>();
     }
 
 }
