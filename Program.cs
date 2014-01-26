@@ -15,7 +15,7 @@ namespace Battleships
             {
                 var gameApi = new RestApi();
                 var i = 0;
-                while (true)
+                while (i < 10)
                 {
                     Console.WriteLine("Game {0}:", i + 1);
                     PlayGame(gameApi);
@@ -46,7 +46,7 @@ namespace Battleships
 
         private static void PlayGame(RestApi gameApi)
         {
-            var d = new Decision();
+            Decision.IDecision d = new Decision.DecisionOld();
             var gameId = gameApi.CreateNewGame();
             GameState state;
             var shoots = 0;

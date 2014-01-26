@@ -6,9 +6,9 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Battleships
+namespace Battleships.Decision
 {
-    class Decision
+    class DecisionOld: IDecision
     {
         public Tuple<int, int> CellToAttack()
         {
