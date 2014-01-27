@@ -5,7 +5,7 @@ using RestSharp;
 
 namespace Battleships
 {
-    internal class RestApi
+    internal class RestApi : Battleships.IGameApi
     {
         private const string ServiceAddress = "https://10.12.216.168";
         private const string AuthHeader = "X-Auth-ShipsApiKey";

@@ -45,14 +45,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Decision\BoardArea.cs" />
-    <Compile Include="Decision\CellCoords.cs" />
+    <Compile Include="CellCoords.cs" />
     <Compile Include="Decision\Chaser.cs" />
     <Compile Include="Decision\Decision.cs" />
-    <Compile Include="Decision\ShipInfo.cs" />
+    <Compile Include="ShipInfo.cs" />
+    <Compile Include="EmulatorApi.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="Decision\DecisionOld.cs" />
     <Compile Include="Decision\IDecision.cs" />
     <Compile Include="Decision\ProbabiltyMap.cs" />
+    <Compile Include="IGameApi.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestApi.cs" />

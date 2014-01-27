@@ -15,7 +15,7 @@ namespace Battleships.Decision
 
         public IList<CellCoords> GetShots(ShipInfo ship)
         {
-            return ship.Cells
+            return ship.HitCells
                 .SelectMany(c => c.GetSurroundingCells())
                 .Where(c => _cellsToAvoid.Contains(c) == false)
                 .ToList();

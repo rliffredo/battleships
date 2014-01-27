@@ -42,7 +42,7 @@ namespace Battleships.Decision
             MarkKnown(x, y);
 
             var cell = new CellCoords(x, y);
-            _currentShip.Cells.Add(cell);
+            _currentShip.HitCells.Add(cell);
 
             throw new NotImplementedException();
         }
@@ -51,34 +51,22 @@ namespace Battleships.Decision
         {
             MarkShipAsHit(x, y);
 
-            var ship = _ships.First(s => s.Size == _currentShip.Cells.Count && !s.IsSunken);
-            foreach (var cell in _currentShip.Cells)
+            var ship = _ships.First(s => s.Size == _currentShip.HitCells.Count && !s.IsSunken);
+            foreach (var cell in _currentShip.HitCells)
             {
-                ship.Cells.Add(cell);
+                ship.HitCells.Add(cell);
                 foreach (var adjCell in cell.GetSurroundingCells())
                 {
                     _knownCells.Add(adjCell);
                 }
             }
 
-            _currentShip.Cells.Clear();
-        }
-
-        public Decision()
-        {
-            CreateInitialShips();
-        }
-
-        private void CreateInitialShips()
-        {
-            for (int i = 1; i <= ShipInfo.MAX_SIZE; ++i)
-                for (int j = i; j <= 4; ++j)
-                    _ships.Add(new ShipInfo(i));
+            _currentShip.HitCells.Clear();
         }
 
         private bool IsChasing()
         {
-            return _currentShip.Cells.Count > 0;
+            return _currentShip.HitCells.Count > 0;
         }
 
         private IList<CellCoords> ChaseShip()
@@ -109,7 +97,7 @@ namespace Battleships.Decision
         }
 
         private ShipInfo _currentShip = new ShipInfo(0);
-        private IList<ShipInfo> _ships = new List<ShipInfo>();
+        private IList<ShipInfo> _ships = ShipInfo.CreateGameShips();
         private ISet<CellCoords> _knownCells = new HashSet<CellCoords>();
 
     }

@@ -48,8 +48,10 @@ namespace Battleships.Decision
             int w = 0;
             for (var i = 0; i < shipSize; ++i)
             {
-                w += CanFitShip(shipSize, new CellCoords(cell.x - i, cell.y), (c, n) => new CellCoords(c.x + n, c.y)) ? 1 : 0;
-                w += CanFitShip(shipSize, new CellCoords(cell.x, cell.y - i), (c, n) => new CellCoords(c.x, c.y + n)) ? 1 : 0;
+                if (CanFitShip(shipSize, new CellCoords(cell.x - i, cell.y), (c, n) => c.AddHorizontal(n)))
+                    w += 1;
+                if (CanFitShip(shipSize, new CellCoords(cell.x, cell.y - i), (c, n) => c.AddVertical(n)))
+                    w += 1;
             }
 
             return w;
@@ -77,7 +79,7 @@ namespace Battleships.Decision
         bool HasAdjacents(CellCoords cell)
         {
             var cellsToCheck = cell.GetSurroundingCells();
-            return _ships.Any(ship => cellsToCheck.Intersect(ship.Cells).Count() > 0);
+            return _ships.Any(ship => cellsToCheck.Intersect(ship.HitCells).Count() > 0);
         }
 
         private IEnumerable<int> ShipsToSink

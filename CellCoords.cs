@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Battleships.Decision
+namespace Battleships
 {
     class CellCoords
     {
@@ -36,6 +36,9 @@ namespace Battleships.Decision
 
         public static CellCoords Min() { return new CellCoords(0, 0); }
         public static CellCoords Max() { return new CellCoords(MAX, MAX); }
+
+        public CellCoords AddHorizontal(int n) { return new CellCoords(this.x + n, this.y); }
+        public CellCoords AddVertical(int n) { return new CellCoords(this.x, this.y + n); }
     }
 
 }
