@@ -15,23 +15,46 @@ namespace Battleships
         public string CreateNewGame()
         {
             _ships = ShipInfo.CreateGameShips();
-            var r = new Random();
-            foreach (var ship in _ships)
+            foreach (var ship in _ships.OrderByDescending(s => s.Size))
             {
-                var direction = r.Next(1) == 0;
-                var initialPos = GetFirstCell(ship.Size, direction);
-                for (var i = 0; i < ship.Size; ++i)
-                {
-                    var cell = direction ? initialPos.AddHorizontal(i) : initialPos.AddVertical(i);
-                    ship.HitCells.Add(cell);
-                }
+                var cells = GetCellsForShip(ship.Size, 10);
+                foreach (var cell in cells)
+                    ship.PositionCells.Add(cell);
             }
             return "42";
         }
 
-        private CellCoords GetFirstCell(int p, bool direction)
+        private IEnumerable<CellCoords> GetCellsForShip(int shipSize, int boardSize)
         {
-            throw new NotImplementedException();
+            // Not really the most optimized approach, but should be good enough...
+            while (true)
+            {
+                var shipCells = CreateRandomShip(shipSize, boardSize);
+                var isShipLegal = 
+                    shipCells
+                        .SelectMany(c => c.GetSurroundingCells())
+                        .Union(shipCells)
+                        .Intersect(_ships.SelectMany(s => s.PositionCells))
+                        .Union(shipCells
+                            .Where(c => c.x < 0 || c.y < 0 || c.x >= boardSize || c.y >= boardSize))
+                        .ToList()
+                        .Count == 0;
+                if (isShipLegal)
+                    return shipCells;
+            }
+        }
+
+        private static List<CellCoords> CreateRandomShip(int shipSize, int boardSize)
+        {
+            var r = new Random();
+            var shipCells = new List<CellCoords>();
+            var direction = r.Next(1) == 0;
+            var initialPos = new CellCoords(r.Next(boardSize), r.Next(boardSize));
+            for (var i = 0; i < shipSize; ++i)
+            {
+                shipCells.Add(direction ? initialPos.AddHorizontal(i) : initialPos.AddVertical(i));
+            }
+            return shipCells;
         }
 
         public int GetCurrentScore()

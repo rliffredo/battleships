@@ -24,7 +24,7 @@ namespace Battleships
             return Tuple.Create(this.x, this.y);
         }
 
-        public List<CellCoords> GetSurroundingCells()
+        public IList<CellCoords> GetSurroundingCells()
         {
             var ret = new List<CellCoords>();
             for (int i = -1; i <= 1; ++i)
