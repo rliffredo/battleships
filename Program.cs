@@ -13,7 +13,7 @@ namespace Battleships
 
             try
             {
-                var gameApi = new RestApi();
+                var gameApi = new EmulatorApi(); // RestApi();
                 var i = 0;
                 while (i < 10)
                 {
@@ -44,9 +44,9 @@ namespace Battleships
             return " ";
         }
 
-        private static void PlayGame(RestApi gameApi)
+        private static void PlayGame(IGameApi gameApi)
         {
-            Decision.IDecision d = new Decision.DecisionOld();
+            Decision.IDecision d = new Decision.Decision();
             var gameId = gameApi.CreateNewGame();
             GameState state;
             var shoots = 0;

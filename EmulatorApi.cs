@@ -15,9 +15,11 @@ namespace Battleships
         public string CreateNewGame()
         {
             _ships = ShipInfo.CreateGameShips();
+            _shots = new List<CellCoords>();
             foreach (var ship in _ships.OrderByDescending(s => s.Size))
             {
                 var cells = GetCellsForShip(ship.Size, 10);
+                ship.PositionCells.Clear();
                 foreach (var cell in cells)
                     ship.PositionCells.Add(cell);
             }
@@ -64,6 +66,9 @@ namespace Battleships
 
         public GameState Shoot(string gameId, int row, int column)
         {
+            if (_shots.Count > 100)
+                throw new Exception("Too many shots!");
+
             Debug.Assert(gameId == "42");
 
             var shot = new CellCoords(row, column);
