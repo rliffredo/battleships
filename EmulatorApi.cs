@@ -11,6 +11,7 @@ namespace Battleships
     {
         private IList<ShipInfo> _ships;
         private IList<CellCoords> _shots;
+        private IList<int> _scores = new List<int>();
 
         public string CreateNewGame()
         {
@@ -18,10 +19,15 @@ namespace Battleships
             _shots = new List<CellCoords>();
             foreach (var ship in _ships.OrderByDescending(s => s.Size))
             {
+                //Console.Write("Ship ({0}): ", ship.Size);
                 var cells = GetCellsForShip(ship.Size, 10);
                 ship.PositionCells.Clear();
                 foreach (var cell in cells)
+                {
                     ship.PositionCells.Add(cell);
+                    //Console.Write("[{0}, {1}] ", cell.x, cell.y);
+                }
+                //Console.WriteLine("");
             }
             return "42";
         }
@@ -61,7 +67,10 @@ namespace Battleships
 
         public int GetCurrentScore()
         {
-            return 1;
+            return _scores
+                .Skip(_scores.Count - 10)
+                .Select(score => 100 - score)
+                .Sum();
         }
 
         public GameState Shoot(string gameId, int row, int column)
@@ -84,10 +93,17 @@ namespace Battleships
             }
 
             hitShip.HitCells.Add(shot);
-            return new GameState {
+            var state = new GameState {
                 IsFinished = _ships.Count(s => s.IsSunken == false) == 0,
                 LastShot = hitShip.IsSunken ? ShotResult.HitAndSunk : ShotResult.Hit
             };
+
+            if (state.IsFinished)
+            {
+                _scores.Add(_shots.Count);
+            }
+
+            return state;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,9 +15,9 @@ namespace Battleships.Decision
             if (IsChasing())
                 return RandomShot(ChaseShip()).AsTuple();
 
-            var unknownPatch = LargestUnknownPatch();
-            if (unknownPatch.Count > 20)
-                return RandomShot(unknownPatch).AsTuple();
+            //var unknownPatch = LargestUnknownPatch();
+            //if (unknownPatch.Count > 25)
+            //    return RandomShot(unknownPatch).AsTuple();
 
             var probabilityMap = CalculateProbabilityMap();
             return RandomShot(probabilityMap).AsTuple();
@@ -41,10 +42,8 @@ namespace Battleships.Decision
         {
             MarkKnown(x, y);
 
-            var cell = new CellCoords(x, y);
-            _currentShip.HitCells.Add(cell);
-
-            throw new NotImplementedException();
+            _lastHit = new CellCoords(x, y);
+            _currentShip.HitCells.Add(_lastHit);
         }
 
         private void MarkShipAsSunk(int x, int y)
@@ -59,20 +58,23 @@ namespace Battleships.Decision
                 {
                     _knownCells.Add(adjCell);
                 }
+                Debug.Assert(_knownCells.Count <= new BoardArea(CellCoords.Min(), CellCoords.Max()).Area);
             }
 
+            Debug.Assert(_knownCells.IsProperSupersetOf(_ships.SelectMany(s => s.HitCells)));
+            _lastHit = null;
             _currentShip.HitCells.Clear();
         }
 
         private bool IsChasing()
         {
-            return _currentShip.HitCells.Count > 0;
+            return _lastHit != null;
         }
 
         private IList<CellCoords> ChaseShip()
         {
-            var chaser = new Chaser(_knownCells);
-            return chaser.GetShots(_currentShip);
+            var chaser = new Chaser();
+            return chaser.GetShots(_currentShip, _lastHit, _knownCells);
         }
 
         private CellCoords RandomShot(IList<CellCoords> candidates)
@@ -85,6 +87,8 @@ namespace Battleships.Decision
 
         private List<CellCoords> LargestUnknownPatch()
         {
+            if (_knownCells.Count > 15)
+                return new BoardArea(CellCoords.Min(), CellCoords.Min()).AllCells;
             var entireBoard = new BoardArea(CellCoords.Min(), CellCoords.Max());
             var res = entireBoard.FindLargestWithout(_knownCells);
             return res.AllCells;
@@ -93,12 +97,15 @@ namespace Battleships.Decision
         private List<CellCoords> CalculateProbabilityMap()
         {
             var map = new ProbabilityMap(_ships, _knownCells);
-            return map.GetBestCandidates();
+            var candidates = map.GetBestCandidates();
+            Debug.Assert(candidates.Intersect(_knownCells).Count() == 0);
+            return candidates;
         }
 
         private ShipInfo _currentShip = new ShipInfo(0);
         private IList<ShipInfo> _ships = ShipInfo.CreateGameShips();
         private ISet<CellCoords> _knownCells = new HashSet<CellCoords>();
+        private CellCoords _lastHit;
 
     }
 

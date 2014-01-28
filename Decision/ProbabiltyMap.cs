@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,8 +18,8 @@ namespace Battleships.Decision
             _ships = ships;
             _knownCells = knownCells;
 
-            for (int i = 0; i < CellCoords.MAX; ++i)
-                for (int j = 0; j < CellCoords.MAX; ++j)
+            for (int i = 0; i <= CellCoords.MAX; ++i)
+                for (int j = 0; j <= CellCoords.MAX; ++j)
                     _map[new CellCoords(i, j)] = 0;
         }
 
@@ -28,13 +29,14 @@ namespace Battleships.Decision
             {
                 UpdateProbabilityMapForShip(shipSize);
             }
+            Debug.Assert(_map.Count(c => c.Value > 0) > 0);
             var maxProb = _map.Max(c => c.Value);
             return _map.Where(c => c.Value == maxProb).Select(c => c.Key).ToList();
         }
 
         void UpdateProbabilityMapForShip(int shipSize)
         {
-            foreach (var cell in _map.Keys)
+            foreach (var cell in _map.Keys.Except(_knownCells).ToList())
             {
                 _map[cell] += WaysShipCanFit(cell, shipSize);
             }
@@ -43,7 +45,7 @@ namespace Battleships.Decision
         int WaysShipCanFit(CellCoords cell, int shipSize)
         {
             if (shipSize == 1)
-                return HasAdjacents(cell) ? 0 : 1;
+                return IsCellAlreadyHit(cell) ? 0 : 1;
 
             int w = 0;
             for (var i = 0; i < shipSize; ++i)
@@ -53,7 +55,6 @@ namespace Battleships.Decision
                 if (CanFitShip(shipSize, new CellCoords(cell.x, cell.y - i), (c, n) => c.AddVertical(n)))
                     w += 1;
             }
-
             return w;
         }
 
@@ -65,8 +66,6 @@ namespace Battleships.Decision
                 cell = offsetCell(cell, i);
                 if (IsCellAlreadyHit(cell))
                     return false;
-                if (HasAdjacents(cell))
-                    return false;
             }
             return true;
         }
@@ -76,20 +75,14 @@ namespace Battleships.Decision
             return _knownCells.Contains(cell);
         }
 
-        bool HasAdjacents(CellCoords cell)
-        {
-            var cellsToCheck = cell.GetSurroundingCells();
-            return _ships.Any(ship => cellsToCheck.Intersect(ship.HitCells).Count() > 0);
-        }
-
         private IEnumerable<int> ShipsToSink
         {
             get
             {
                 return _ships
-                                .Where(s => s.IsSunken == false)
-                                .Select(s => s.Size)
-                                .Distinct();
+                    .Where(s => s.IsSunken == false)
+                    .Select(s => s.Size)
+                    .Distinct();
             }
         }
     }

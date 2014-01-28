@@ -26,8 +26,8 @@ namespace Battleships.Decision
         private readonly int _right;
         private readonly List<CellCoords> _allCells = new List<CellCoords>();
 
-        public CellCoords TopLeft { get { return new CellCoords(_top, _left); } }
-        public CellCoords BottomRight { get { return new CellCoords(_bottom, _right); } }
+        public CellCoords TopLeft { get { return new CellCoords(_left, _top); } }
+        public CellCoords BottomRight { get { return new CellCoords(_right, _bottom); } }
         public int Area { get { return _allCells.Count; } }
         public List<CellCoords> AllCells { get { return _allCells; } }
         public List<BoardArea> Split(CellCoords pivot)
@@ -55,6 +55,9 @@ namespace Battleships.Decision
 
         public BoardArea FindLargestWithout(IEnumerable<CellCoords> cells)
         {
+            if (Area == 1)
+                return this;
+
             var cellList = cells.ToList();
             if (cellList.Count == 0)
                 return this;
@@ -63,10 +66,11 @@ namespace Battleships.Decision
             if (cell == null)
                 return this;
 
-            var slices = this.Split(cellList[0]);
+            var slices = this.Split(cell);
             var reducedCells = cellList.SkipWhile(c => c == cell).ToList();
             var largestPatches = slices.Select(s => s.FindLargestWithout(reducedCells));
             var maxArea = largestPatches.Max(p => p.Area);
+            Debug.Assert(maxArea < Area);
             return largestPatches.First(p => p.Area == maxArea);
         }
 
