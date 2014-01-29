@@ -20,6 +20,10 @@ namespace Battleships
 
         public RestApi()
         {
+            // ignore HTTPS certificate errors
+            ServicePointManager.ServerCertificateValidationCallback =
+                (sender, cert, chain, policy) => true;
+
             _client = new RestClient(ServiceAddress);
         }
 

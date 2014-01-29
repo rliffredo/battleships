@@ -10,7 +10,7 @@ namespace Battleships.Decision
 {
     class DecisionOld: IDecision
     {
-        public Tuple<int, int> CellToAttack()
+        public CellCoords CellToAttack()
         {
             ResetProbabilityMap();
             CalculateProbabilityMap();
@@ -122,7 +122,7 @@ namespace Battleships.Decision
             lastHit = Tuple.Create(x, y);
         }
 
-        private Tuple<int, int> PickBestCell()
+        private CellCoords PickBestCell()
         {
             var bestCandidate = Tuple.Create(0, 0);
             for (var i = 0; i < 10; i++)
@@ -146,7 +146,7 @@ namespace Battleships.Decision
 
             var r = new Random();
             var pos = r.Next(bestCandidates.Count);
-            return bestCandidates[pos];
+            return new CellCoords(bestCandidates[pos].Item1, bestCandidates[pos].Item2);
         }
 
         private void CalculateProbabilityMap()

@@ -10,17 +10,17 @@ namespace Battleships.Decision
 
     class Decision: IDecision
     {
-        public Tuple<int, int> CellToAttack()
+        public CellCoords CellToAttack()
         {
             if (IsChasing())
-                return RandomShot(ChaseShip()).AsTuple();
+                return RandomShot(ChaseShip());
 
-            //var unknownPatch = LargestUnknownPatch();
-            //if (unknownPatch.Count > 25)
-            //    return RandomShot(unknownPatch).AsTuple();
+            var unknownPatch = LargestUnknownPatch();
+            if (unknownPatch.Count > 35)
+                return RandomShot(unknownPatch);
 
             var probabilityMap = CalculateProbabilityMap();
-            return RandomShot(probabilityMap).AsTuple();
+            return RandomShot(probabilityMap);
         }
 
         public void UpdateWithFeedback(int x, int y, ShotResult result)
@@ -90,7 +90,7 @@ namespace Battleships.Decision
             if (_knownCells.Count > 15)
                 return new BoardArea(CellCoords.Min(), CellCoords.Min()).AllCells;
             var entireBoard = new BoardArea(CellCoords.Min(), CellCoords.Max());
-            var res = entireBoard.FindLargestWithout(_knownCells);
+            var res = entireBoard.FindLargestWithout(_knownCells, 0);
             return res.AllCells;
         }
 

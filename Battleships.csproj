@@ -48,6 +48,8 @@
     <Compile Include="CellCoords.cs" />
     <Compile Include="Decision\Chaser.cs" />
     <Compile Include="Decision\Decision.cs" />
+    <Compile Include="GameView.cs" />
+    <Compile Include="IGameView.cs" />
     <Compile Include="ShipInfo.cs" />
     <Compile Include="EmulatorApi.cs" />
     <Compile Include="GameState.cs" />

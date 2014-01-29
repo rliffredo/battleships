@@ -9,10 +9,16 @@ namespace Battleships
 {
     class EmulatorApi: IGameApi
     {
+        private IGameView _view;
         private IList<ShipInfo> _ships;
         private IList<CellCoords> _shots;
         private IList<int> _scores = new List<int>();
         private int _bestScore;
+
+        public EmulatorApi(IGameView view)
+        {
+            _view = view;
+        }
 
         public string CreateNewGame()
         {
@@ -20,16 +26,14 @@ namespace Battleships
             _shots = new List<CellCoords>();
             foreach (var ship in _ships.OrderByDescending(s => s.Size))
             {
-                //Console.Write("Ship ({0}): ", ship.Size);
                 var cells = GetCellsForShip(ship.Size, 10);
                 ship.PositionCells.Clear();
                 foreach (var cell in cells)
                 {
                     ship.PositionCells.Add(cell);
-                    //Console.Write("[{0}, {1}] ", cell.x, cell.y);
                 }
-                //Console.WriteLine("");
             }
+            _view.AddShips(_ships);
             return "42";
         }
 
