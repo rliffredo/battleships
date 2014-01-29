@@ -15,13 +15,18 @@ namespace Battleships
             {
                 var gameApi = new EmulatorApi(); // RestApi();
                 var i = 0;
-                while (i < 10)
+                while (i < 1000)
                 {
-                    Console.WriteLine("Game {0}:", i + 1);
-                    PlayGame(gameApi);
+                    Console.Write("Game {0}... ", i + 1);
+                    var shoots = PlayGame(gameApi);
+                    Console.WriteLine("{0} shoots", shoots);
                     ++i;
+                    if (i % 10 == 0)
+                    {
+                        Console.WriteLine("Current score: " + gameApi.GetCurrentScore());
+                    }
                 }
-                Console.WriteLine("current score: " + gameApi.GetCurrentScore());
+                Console.WriteLine("Best result: " + gameApi.GetBestScore());
             }
             catch (Exception ex)
             {
@@ -44,7 +49,7 @@ namespace Battleships
             return " ";
         }
 
-        private static void PlayGame(IGameApi gameApi)
+        private static int PlayGame(IGameApi gameApi)
         {
             Decision.IDecision d = new Decision.Decision();
             //Decision.IDecision d = new Decision.DecisionOld();
@@ -54,15 +59,16 @@ namespace Battleships
             do
             {
                 shoots++;
-                // Console.Write("Shooting at: ");
+                //Console.Write("Shooting at: ");
                 var coords = d.CellToAttack();
-                // Console.Write("[{0}, {1}]: ", coords.Item1, coords.Item2);
+                //Console.Write("[{0}, {1}]: ", coords.Item1, coords.Item2);
                 state = gameApi.Shoot(gameId, coords.Item1, coords.Item2);
                 // Console.WriteLine(state.LastShot);
                 d.UpdateWithFeedback(coords.Item1, coords.Item2, state.LastShot);
-                Console.Write(GetShotResult(state.LastShot));
+                //Console.Write(GetShotResult(state.LastShot));
+                //Console.Write("; ");
             } while (!state.IsFinished);
-            Console.WriteLine("\nTotal shoots: " + shoots);
+            return shoots;
         }
     }
 }

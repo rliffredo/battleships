@@ -12,6 +12,7 @@ namespace Battleships
         private IList<ShipInfo> _ships;
         private IList<CellCoords> _shots;
         private IList<int> _scores = new List<int>();
+        private int _bestScore;
 
         public string CreateNewGame()
         {
@@ -67,10 +68,7 @@ namespace Battleships
 
         public int GetCurrentScore()
         {
-            return _scores
-                .Skip(_scores.Count - 10)
-                .Select(score => 100 - score)
-                .Sum();
+            return _bestScore;
         }
 
         public GameState Shoot(string gameId, int row, int column)
@@ -100,10 +98,26 @@ namespace Battleships
 
             if (state.IsFinished)
             {
-                _scores.Add(_shots.Count);
+                CalculateScore(_shots.Count);
             }
 
             return state;
+        }
+
+        private void CalculateScore(int shoots)
+        {
+            _scores.Add(shoots);
+            var currentScore = _scores
+                 .Skip(_scores.Count - 10)
+                 .Select(score => 100 - score)
+                 .Sum();
+            if (currentScore > _bestScore)
+                _bestScore = currentScore;
+        }
+
+        public int GetBestScore()
+        {
+            return _scores.Max();
         }
     }
 }

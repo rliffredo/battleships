@@ -60,11 +60,9 @@ namespace Battleships.Decision
 
         bool CanFitShip(int shipSize, CellCoords baseCell, Func<CellCoords, int, CellCoords> offsetCell)
         {
-            var cell = baseCell;
             for (var i = 0; i < shipSize; ++i)
             {
-                cell = offsetCell(cell, i);
-                if (IsCellAlreadyHit(cell))
+                if (IsCellAlreadyHit(offsetCell(baseCell, i)))
                     return false;
             }
             return true;

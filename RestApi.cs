@@ -89,6 +89,11 @@ namespace Battleships
             return int.Parse(response.Data["Score"]);
         }
 
+        public int GetBestScore()
+        {
+            return GetCurrentScore() / 10;
+        }
+
         public bool SetNick(string nickName)
         {
             var response = SendRequest("/Nick/" + nickName, Method.PUT);

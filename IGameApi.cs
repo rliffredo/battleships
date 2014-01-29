@@ -5,6 +5,7 @@ namespace Battleships
     {
         string CreateNewGame();
         int GetCurrentScore();
+        int GetBestScore();
         GameState Shoot(string gameId, int row, int column);
     }
 }
